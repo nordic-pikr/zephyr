@@ -1,0 +1,57 @@
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  XCU warning lamps.
+
+  All lamps are driven together by the common yellow and red outputs.
+  Each lamp is described by a child node and reports its state on four
+  status inputs: two for the yellow light and two for the red light.
+
+  Example:
+
+    lamps {
+      compatible = "auxilia,xcu-lamps";
+      yellow-gpios = <&gpioe 5 GPIO_ACTIVE_HIGH>;
+      red-gpios = <&gpioe 6 GPIO_ACTIVE_HIGH>;
+
+      lamp1: lamp_1 {
+        status-gpios = <&gpioe 0 GPIO_ACTIVE_HIGH>,
+                       <&gpioe 1 GPIO_ACTIVE_HIGH>,
+                       <&gpioe 2 GPIO_ACTIVE_HIGH>,
+                       <&gpioe 3 GPIO_ACTIVE_HIGH>;
+      };
+    };
+
+compatible: "auxilia,xcu-lamps"
+
+include: base.yaml
+
+properties:
+  yellow-gpios:
+    type: phandle-array
+    required: true
+    description: Yellow lamp output (YEL_LAMP), common for all lamps.
+
+  red-gpios:
+    type: phandle-array
+    required: true
+    description: Red lamp output (RED_LAMP), common for all lamps.
+
+  ok-gpios:
+    type: phandle-array
+    description: Aggregated lamps OK input (LAMPS_OK).
+
+child-binding:
+  description: Single warning lamp.
+
+  properties:
+    status-gpios:
+      type: phandle-array
+      required: true
+      description: |
+        Four lamp status inputs, in order YLAMPn_STATUS1, YLAMPn_STATUS2,
+        RLAMPn_STATUS1, RLAMPn_STATUS2.
+
+    label:
+      type: string
+      description: Human readable lamp name.

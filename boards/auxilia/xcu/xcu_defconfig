@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+
+# Enable GPIO
+CONFIG_GPIO=y
+
+# Enable UART driver and console on USART1 (XPORT)
+CONFIG_SERIAL=y
+CONFIG_CONSOLE=y
+CONFIG_UART_CONSOLE=y

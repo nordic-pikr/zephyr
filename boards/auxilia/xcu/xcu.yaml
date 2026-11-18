@@ -1,0 +1,15 @@
+identifier: xcu
+name: Auxilia XCU
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+  - gnuarmemb
+ram: 64
+flash: 512
+supported:
+  - gpio
+  - uart
+  - i2c
+  - adc
+vendor: auxilia

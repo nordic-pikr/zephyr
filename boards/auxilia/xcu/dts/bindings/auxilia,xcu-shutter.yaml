@@ -1,0 +1,62 @@
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  XCU X-ray shutter controlled over discrete GPIO lines.
+
+  The shutter is armed with the enable line and opened by asserting the
+  open request line. The shutter reports its position on two open
+  acknowledge lines, which have to be evaluated together.
+
+  Example:
+
+    shutter: shutter {
+      compatible = "auxilia,xcu-shutter";
+      enable-gpios = <&gpiob 12 GPIO_ACTIVE_HIGH>;
+      open-rq-gpios = <&gpiod 11 GPIO_ACTIVE_HIGH>;
+      open-ack-gpios = <&gpiob 13 GPIO_ACTIVE_HIGH>,
+                       <&gpiob 14 GPIO_ACTIVE_HIGH>;
+    };
+
+compatible: "auxilia,xcu-shutter"
+
+include: base.yaml
+
+properties:
+  enable-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      Shutter enable output (ENABLE_SH). The open request must be
+      deasserted whenever this line changes state.
+
+  open-rq-gpios:
+    type: phandle-array
+    required: true
+    description: Shutter open request output (SH_OPEN_RQ).
+
+  open-ack-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      Two shutter open acknowledge inputs, in order SH_OPEN_ACK1,
+      SH_OPEN_ACK2.
+
+  open-gpios:
+    type: phandle-array
+    description: Shutter open state inputs (SH_OPEN, SH_OPEN_2).
+
+  test-gpios:
+    type: phandle-array
+    description: Shutter test output (TEST_SHUTTER).
+
+  interlock-closed-gpios:
+    type: phandle-array
+    description: Shutter interlock closed input (SH_INTL_CLOSED).
+
+  interlock-override-gpios:
+    type: phandle-array
+    description: Shutter interlock closed override input (SH_INTL_CLOSED_OVERRIDE).
+
+  ok-gpios:
+    type: phandle-array
+    description: Shutter OK input (SHUTTER_OK).

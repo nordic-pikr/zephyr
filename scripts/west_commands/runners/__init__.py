@@ -70,6 +70,7 @@ _names = [
     'silabs_commander',
     'spi_burn',
     'spsdk',
+    'stflash',
     'stlink_gdbserver',
     'stm32cubeprogrammer',
     'stm32flash',

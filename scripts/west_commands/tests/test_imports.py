@@ -68,6 +68,7 @@ def test_runner_imports():
         'silabs_commander',
         'spi_burn',
         'spsdk',
+        'stflash',
         'stlink_gdbserver',
         'stm32cubeprogrammer',
         'stm32flash',

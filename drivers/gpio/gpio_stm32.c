@@ -91,8 +91,10 @@ static int gpio_stm32_flags_to_conf(gpio_flags_t flags, pinctrl_soc_pin_t *pincf
 			 * in the configuration would mess things up because that
 			 * bit is shared with ODR on STM32F1.
 			 */
-			LOG_WRN("STM32F1: ignoring GPIO_PULL_UP/DOWN on OUTPUT pin");
-			pupd = 0;
+			if (pupd != 0) {
+				LOG_WRN("STM32F1: ignoring GPIO_PULL_UP/DOWN on OUTPUT pin");
+				pupd = 0;
+			}
 		}
 	} else if ((flags & GPIO_INPUT) != 0) {
 		/* Input */

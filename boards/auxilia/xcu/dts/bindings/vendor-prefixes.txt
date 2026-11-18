@@ -1,0 +1,3 @@
+# Additional vendor prefixes used by the XCU board
+
+auxilia	Auxilia

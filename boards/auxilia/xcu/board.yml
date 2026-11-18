@@ -1,0 +1,6 @@
+board:
+  name: xcu
+  full_name: Auxilia XCU
+  vendor: auxilia
+  socs:
+    - name: stm32f103xe

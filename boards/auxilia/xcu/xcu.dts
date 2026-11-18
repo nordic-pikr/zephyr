@@ -1,0 +1,191 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+#include <st/f1/stm32f103Xe.dtsi>
+#include <st/f1/stm32f103v(c-d-e)tx-pinctrl.dtsi>
+
+/ {
+	model = "Auxilia XCU board";
+	compatible = "auxilia,xcu";
+
+	chosen {
+		zephyr,console = &usart1;
+		zephyr,shell-uart = &usart1;
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+	};
+
+	shutter: shutter {
+		compatible = "auxilia,xcu-shutter";
+		enable-gpios = <&gpiob 12 GPIO_ACTIVE_HIGH>;
+		open-rq-gpios = <&gpiod 11 GPIO_ACTIVE_HIGH>;
+		open-ack-gpios = <&gpiob 13 GPIO_ACTIVE_HIGH>,
+				 <&gpiob 14 GPIO_ACTIVE_HIGH>;
+		open-gpios = <&gpiob 15 GPIO_ACTIVE_HIGH>,
+			     <&gpiod 8 GPIO_ACTIVE_HIGH>;
+		test-gpios = <&gpiob 3 GPIO_ACTIVE_HIGH>;
+		interlock-closed-gpios = <&gpiod 9 GPIO_ACTIVE_HIGH>;
+		interlock-override-gpios = <&gpiob 11 GPIO_ACTIVE_LOW>;
+		ok-gpios = <&gpioa 11 GPIO_ACTIVE_HIGH>;
+	};
+
+	lamps: lamps {
+		compatible = "auxilia,xcu-lamps";
+		yellow-gpios = <&gpioe 5 GPIO_ACTIVE_HIGH>;
+		red-gpios = <&gpioe 6 GPIO_ACTIVE_HIGH>;
+		ok-gpios = <&gpioa 12 GPIO_ACTIVE_HIGH>;
+
+		lamp1: lamp_1 {
+			label = "Lamp 1";
+			status-gpios = <&gpioe 0 GPIO_ACTIVE_HIGH>,
+				       <&gpioe 1 GPIO_ACTIVE_HIGH>,
+				       <&gpioe 2 GPIO_ACTIVE_HIGH>,
+				       <&gpioe 3 GPIO_ACTIVE_HIGH>;
+		};
+
+		lamp2: lamp_2 {
+			label = "Lamp 2";
+			status-gpios = <&gpiob 4 GPIO_ACTIVE_HIGH>,
+				       <&gpiob 5 GPIO_ACTIVE_HIGH>,
+				       <&gpiob 6 GPIO_ACTIVE_HIGH>,
+				       <&gpiob 7 GPIO_ACTIVE_HIGH>;
+		};
+
+		lamp3: lamp_3 {
+			label = "Lamp 3";
+			status-gpios = <&gpiod 4 GPIO_ACTIVE_HIGH>,
+				       <&gpiod 5 GPIO_ACTIVE_HIGH>,
+				       <&gpiod 6 GPIO_ACTIVE_HIGH>,
+				       <&gpiod 7 GPIO_ACTIVE_HIGH>;
+		};
+
+		lamp4: lamp_4 {
+			label = "Lamp 4";
+			status-gpios = <&gpiod 0 GPIO_ACTIVE_HIGH>,
+				       <&gpiod 1 GPIO_ACTIVE_HIGH>,
+				       <&gpiod 2 GPIO_ACTIVE_HIGH>,
+				       <&gpiod 3 GPIO_ACTIVE_HIGH>;
+		};
+
+		lamp5: lamp_5 {
+			label = "Lamp 5";
+			status-gpios = <&gpioc 8 GPIO_ACTIVE_HIGH>,
+				       <&gpioc 9 GPIO_ACTIVE_HIGH>,
+				       <&gpioc 10 GPIO_ACTIVE_HIGH>,
+				       <&gpioc 11 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
+	hv_interlock: hv_interlock {
+		compatible = "auxilia,xcu-hv-interlock";
+		close-gpios = <&gpioa 8 GPIO_ACTIVE_HIGH>;
+		closed-gpios = <&gpiob 10 GPIO_ACTIVE_HIGH>;
+	};
+
+	leds: leds {
+		compatible = "gpio-leds";
+
+		lamps_ok_led: led_0 {
+			gpios = <&gpiod 12 GPIO_ACTIVE_HIGH>;
+			label = "Lamps OK LED";
+		};
+
+		shutter_ok_led: led_1 {
+			gpios = <&gpiod 13 GPIO_ACTIVE_HIGH>;
+			label = "Shutter OK LED";
+		};
+	};
+
+	zephyr,user {
+		buzzer-gpios = <&gpioe 4 GPIO_ACTIVE_HIGH>;
+		external-triggers-gpios = <&gpiod 10 GPIO_ACTIVE_LOW>;
+		io-channels = <&adc1 14>, <&adc1 15>;
+		io-channel-names = "AIN1", "AIN2";
+	};
+
+	aliases {
+		led0 = &lamps_ok_led;
+		led1 = &shutter_ok_led;
+	};
+};
+
+&clk_hse {
+	clock-frequency = <DT_FREQ_M(12)>;
+	status = "okay";
+};
+
+&pll {
+	mul = <6>;
+	clocks = <&clk_hse>;
+	status = "okay";
+};
+
+&rcc {
+	clocks = <&pll>;
+	clock-frequency = <DT_FREQ_M(72)>;
+	ahb-prescaler = <1>;
+	apb1-prescaler = <2>;
+	apb2-prescaler = <1>;
+};
+
+/* SWD only, releases PB3, PB4 and PA15 for GPIO use */
+&pinctrl {
+	swj-cfg = "jtag-disable";
+};
+
+/* XPORT, CLI */
+&usart1 {
+	pinctrl-0 = <&usart1_tx_pa9 &usart1_rx_pa10>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
+};
+
+/* LCD */
+&usart2 {
+	pinctrl-0 = <&usart2_tx_pa2 &usart2_rx_pa3>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
+};
+
+&i2c1 {
+	pinctrl-0 = <&i2c1_scl_remap1_pb8 &i2c1_sda_remap1_pb9>;
+	pinctrl-names = "default";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	status = "okay";
+};
+
+&adc12_common {
+	status = "okay";
+};
+
+/* PCLK2 / 6 = 12 MHz, ADC clock must not exceed 14 MHz */
+&adc1 {
+	clocks = <&rcc STM32_CLOCK(APB2, 9)>,
+		 <&rcc STM32_SRC_SYSCLK ADC_PRE(ADC_PRE_DIV_6)>;
+	clock-names = "adcx", "adc_pre";
+	pinctrl-0 = <&adc1_in14_pc4 &adc1_in15_pc5>;
+	pinctrl-names = "default";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	channel@e {
+		reg = <14>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 240)>;
+		zephyr,resolution = <12>;
+	};
+
+	channel@f {
+		reg = <15>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 240)>;
+		zephyr,resolution = <12>;
+	};
+};
